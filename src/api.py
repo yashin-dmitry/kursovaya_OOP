@@ -12,14 +12,17 @@ class AbstractVacancyAPI(ABC):
 
 
 class HhVacancyAPI(AbstractVacancyAPI):
-    def __init__(self, query):
+    def __init__(self, query: str) -> None:
+        super().__init__()
         self.query = query
         self.base_url = "https://api.hh.ru/"
 
-    def connect(self):
+    def connect(self) -> None:
+        # Код для подключения к API hh.ru
         pass
 
-    def get_vacancies(self):
+
+    def get_vacancies(self) -> list:
         url = f"{self.base_url}vacancies"
         params = {"text": self.query}
         response = requests.get(url, params=params)
@@ -27,7 +30,7 @@ class HhVacancyAPI(AbstractVacancyAPI):
             return response.json()["items"]
         else:
             print("Ошибка при получении вакансий:", response.status_code)
-            return None
+            return []
 
 class HeadHunterAPI(AbstractVacancyAPI):
     def __init__(self, query):

@@ -10,5 +10,15 @@ class JSONSaver:
             file.write("\n")
 
     def delete_vacancy(self, vacancy):
-        # Реализация удаления вакансии из файла
-        pass
+        # Открываем файл для чтения
+        with open(self.filename, "r") as file:
+            data = json.load(file)  # Загружаем данные из файла
+
+        for idx, item in enumerate(data):
+            if item["link"] == vacancy.link:
+                del data[idx]  # Удаляем вакансию из данных
+                break
+
+        # Открываем файл для записи и сохраняем обновленные данные
+        with open(self.filename, "w") as file:
+            json.dump(data, file)

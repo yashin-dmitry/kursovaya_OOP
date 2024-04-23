@@ -52,10 +52,24 @@ def interact_with_user() -> None:
             print("Ошибка: выберите корректное действие.")
 
 
+def parse_salary(salary_str: str) -> float:
+    """
+    Парсит строку с зарплатой и возвращает среднее значение.
+    """
+    parts = salary_str.split('-')
+    salary_values = [float(part.replace(',', '.'))
+                     for part in parts if part.isdigit()]
+    return sum(salary_values) / len(salary_values) if salary_values else 0
+
+
 def get_top_n_vacancies(api: HhVacancyAPI, n: int) -> list:
+    """
+    Получает топ N вакансий по зарплате.
+    """
     vacancies = api.get_vacancies()
     if vacancies:
-        sorted_vacancies = sorted(vacancies, key=lambda x: x.salary,
+        sorted_vacancies = sorted(vacancies,
+                                  key=lambda x: parse_salary(x.salary),
                                   reverse=True)
         return sorted_vacancies[:n]
     else:
@@ -66,10 +80,16 @@ def get_keyword_vacancies(api: HhVacancyAPI, keyword: str) -> list:
     vacancies = api.get_vacancies()
     if vacancies:
         keyword_vacancies = [vacancy for vacancy in vacancies if
-                             keyword.lower() in vacancy.description.lower()]
-        return keyword_vacancies
+                             keyword.lower() in vacancy.description.lower() and
+                             vacancy.description.strip()]
+        if keyword_vacancies:
+            for vacancy in keyword_vacancies:
+                print(f"Описание вакансии: {vacancy.description}")
+        else:
+            print(
+                f"В описаниях вакансий не найдено ключевое слово '{keyword}'.")
     else:
-        return []
+        print("Не удалось получить вакансии. Попробуйте еще раз.")
 
 
 if __name__ == "__main__":
